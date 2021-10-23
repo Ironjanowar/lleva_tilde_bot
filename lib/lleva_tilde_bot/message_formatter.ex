@@ -54,20 +54,36 @@ defmodule LlevaTildeBot.MessageFormatter do
       |> maybe_add(result[:conclusion])
       |> maybe_add(result[:reason])
       |> maybe_add(result[:result])
+      |> maybe_add(result[:diacritic_examples])
 
     {message, [parse_mode: "Markdown"]}
   end
 
   defp format_result_field({field, nil}), do: {field, nil}
   defp format_result_field({field, ""}), do: {field, nil}
+  defp format_result_field({field, []}), do: {field, nil}
   defp format_result_field({:warning, warn}), do: {:warning, "⚠ #{warn}\n"}
   defp format_result_field({:syllables, syl}), do: {:syllables, "*Sílabas*\n  __#{syl}__\n"}
   defp format_result_field({:analysis, analysis}), do: {:analysis, "#{analysis}\n"}
   defp format_result_field({:reason, reason}), do: {:reason, "__Razón:__ #{reason}\n"}
   defp format_result_field({:result, result}), do: {:result, "#{result}"}
   defp format_result_field({:conclusion, con}), do: {:conclusion, "*Conclusión*\n#{con}\n"}
+
+  defp format_result_field({:diacritic_examples, examples}),
+    do: {:diacritic_examples, "*Se escribirá:*\n#{format_diacritic_examples(examples)}\n"}
+
   defp format_result_field(ignore), do: ignore
 
+  defp maybe_add(text, []), do: text
   defp maybe_add(text, nil), do: text
+  defp maybe_add(text, ""), do: text
   defp maybe_add(text, to_add), do: "#{text}\n#{to_add}"
+
+  defp format_diacritic_examples(examples) do
+    examples
+    |> Enum.map(fn %{word: word, type: type, example: example} ->
+      "\n  *#{word}* #{type}\n    _#{example}_"
+    end)
+    |> Enum.join("\n")
+  end
 end

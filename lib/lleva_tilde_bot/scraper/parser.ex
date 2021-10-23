@@ -7,6 +7,7 @@ defmodule LlevaTildeBot.Scraper.Parser do
       reason = get_reason(document)
       result = get_result(document)
       warning = get_warning(document)
+      diacritic_examples = get_diacritic_examples(document)
 
       result =
         %{
@@ -15,7 +16,8 @@ defmodule LlevaTildeBot.Scraper.Parser do
           conclusion: conclusion,
           reason: reason,
           result: result,
-          warning: warning
+          warning: warning,
+          diacritic_examples: diacritic_examples
         }
         |> IO.inspect()
 
@@ -28,7 +30,6 @@ defmodule LlevaTildeBot.Scraper.Parser do
     |> Floki.find("article")
     |> Floki.find("div.word")
     |> Enum.at(0)
-    |> Floki.text()
     |> clean_string()
   end
 
@@ -47,7 +48,6 @@ defmodule LlevaTildeBot.Scraper.Parser do
     document
     |> Floki.find("article")
     |> Floki.find("p.resulttext")
-    |> Floki.text()
     |> clean_string()
   end
 
@@ -56,7 +56,6 @@ defmodule LlevaTildeBot.Scraper.Parser do
     |> Floki.find("article")
     |> Floki.find("p.showtext")
     |> Enum.at(1)
-    |> Floki.text()
     |> clean_string
   end
 
@@ -66,7 +65,6 @@ defmodule LlevaTildeBot.Scraper.Parser do
       |> Floki.find("article")
       |> Floki.find("div.resulttext")
       |> Enum.at(1)
-      |> Floki.text()
       |> clean_string()
 
     correct_word = get_correct_word(document)
@@ -83,7 +81,6 @@ defmodule LlevaTildeBot.Scraper.Parser do
     |> Floki.find("article")
     |> Floki.find("div.word")
     |> Enum.at(1)
-    |> Floki.text()
     |> clean_string()
   end
 
@@ -92,12 +89,35 @@ defmodule LlevaTildeBot.Scraper.Parser do
     |> Floki.find("article")
     |> Floki.find("div.warning")
     |> Floki.find(".text_warning")
-    |> Floki.text()
     |> clean_string()
   end
 
+  defp get_diacritic_examples(document) do
+    parent =
+      document
+      |> Floki.find("article")
+      |> Floki.find("div.resulttext")
+
+    diacritic_words =
+      Floki.find(parent, "div.diacriticWord")
+      |> Enum.map(&clean_string/1)
+
+    diacritic_word_types =
+      Floki.find(parent, "div.hometext")
+      |> Enum.map(&clean_string/1)
+
+    diacritic_examples =
+      Floki.find(parent, "div.diacriticText")
+      |> Enum.map(&clean_string/1)
+
+    Enum.zip_with([diacritic_words, diacritic_word_types, diacritic_examples], &to_diacritic/1)
+  end
+
+  defp to_diacritic([word, type, example]), do: %{word: word, type: type, example: example}
+
   defp clean_string(string) do
     string
+    |> Floki.text()
     |> String.replace("\n", "")
     |> String.trim()
   end
