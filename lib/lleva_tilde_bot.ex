@@ -5,6 +5,7 @@ defmodule LlevaTildeBot do
 
   def get_word(text) do
     with {:ok, word} <- parse_input(text),
+         :ok <- check_acute_accent(word),
          {:ok, result} <- Scraper.get_word(word) do
       MessageFormatter.format_word_result(word, result)
     else
@@ -28,4 +29,13 @@ defmodule LlevaTildeBot do
   end
 
   defp parse_input(_), do: {:error, :bad_input}
+
+  @acute_accents ["á", "é", "í", "ó", "ú"]
+  defp check_acute_accent(word) do
+    if Enum.any?(@acute_accents, &String.contains?(word, &1)) do
+      :ok
+    else
+      {:error, :bad_input}
+    end
+  end
 end

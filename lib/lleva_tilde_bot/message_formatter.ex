@@ -21,6 +21,8 @@ defmodule LlevaTildeBot.MessageFormatter do
     _Este bot lo ha hecho_ [@Ironjanowar](https://github.com/Ironjanowar) _con amor ❤_
 
     Si quieres dar un poco de apoyo deja una estrella ⭐ en el [repositorio](https://github.com/Ironjanowar/lleva_tilde_bot)
+
+    También puedes usar la web https://llevatilde.es de la que se sacan los análisis. Este bot *no tiene relación con la web* solo extrae los análisis.
     """
 
     {message, [parse_mode: "Markdown"]}
@@ -32,8 +34,11 @@ defmodule LlevaTildeBot.MessageFormatter do
   end
 
   def bad_input() do
-    message =
-      "Lo siento, solo puedo analizar una palabra a la vez. Si necesitas ayuda manda el comand /help"
+    message = """
+    Lo siento, solo puedo analizar palabras de una en una y con al menos una tilde donde creas que va la acentuación.
+
+    Si necesitas ayuda manda el comando /help
+    """
 
     {message, []}
   end
