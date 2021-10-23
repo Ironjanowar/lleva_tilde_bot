@@ -1,4 +1,21 @@
 defmodule LlevaTildeBot.MessageFormatter do
+  def help_command() do
+    message = """
+    Envía una palabra con una tilde donde dudes que debería ir.
+
+    Por ejemplo:
+      - _línea_
+      - _esdrújula_
+      - _monuménto_ (no lleva tilde)
+      - _cása_ (no lleva tilde)
+      - _cláramente_ (no lleva tilde)
+
+    El bot contestará con un análisis de la palabra.
+    """
+
+    {message, [parse_mode: "Markdown"]}
+  end
+
   def unknown_error() do
     message = "Ha ocurrido un error inesperado, lo siento :("
     {message, []}
