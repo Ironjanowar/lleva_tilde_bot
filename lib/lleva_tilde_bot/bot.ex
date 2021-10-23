@@ -7,6 +7,7 @@ defmodule LlevaTildeBot.Bot do
 
   command("start", description: "Says hi!")
   command("help", description: "Print the bot's help")
+  command("about", description: "About the bot")
 
   middleware(ExGram.Middleware.IgnoreUsername)
 
@@ -20,6 +21,11 @@ defmodule LlevaTildeBot.Bot do
 
   def handle({:command, :help, _msg}, context) do
     {message, opts} = MessageFormatter.help_command()
+    answer(context, message, opts)
+  end
+
+  def handle({:command, :about, _msg}, context) do
+    {message, opts} = MessageFormatter.about_command()
     answer(context, message, opts)
   end
 

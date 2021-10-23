@@ -16,6 +16,16 @@ defmodule LlevaTildeBot.MessageFormatter do
     {message, [parse_mode: "Markdown"]}
   end
 
+  def about_command() do
+    message = """
+    _Este bot lo ha hecho_ [@Ironjanowar](https://github.com/Ironjanowar) _con amor ❤_
+
+    Si quieres dar un poco de apoyo deja una estrella ⭐ en el [repositorio](https://github.com/Ironjanowar/lleva_tilde_bot)
+    """
+
+    {message, [parse_mode: "Markdown"]}
+  end
+
   def unknown_error() do
     message = "Ha ocurrido un error inesperado, lo siento :("
     {message, []}
