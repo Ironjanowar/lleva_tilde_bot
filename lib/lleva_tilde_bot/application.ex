@@ -7,9 +7,11 @@ defmodule LlevaTildeBot.Application do
 
   @impl true
   def start(_type, _args) do
+    token = ExGram.Config.get(:ex_gram, :token)
+
     children = [
-      # Starts a worker by calling: LlevaTildeBot.Worker.start_link(arg)
-      # {LlevaTildeBot.Worker, arg}
+      ExGram,
+      {LlevaTildeBot.Bot, [method: :polling, token: token]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
