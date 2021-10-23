@@ -19,4 +19,9 @@ defmodule LlevaTildeBot.Bot do
   def handle({:command, :help, _msg}, context) do
     answer(context, "Here is your help:")
   end
+
+  def handle({:text, text, _msg}, context) do
+    {message, opts} = LlevaTildeBot.get_word(text)
+    answer(context, message, opts)
+  end
 end

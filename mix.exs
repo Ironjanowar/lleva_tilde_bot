@@ -26,7 +26,8 @@ defmodule LlevaTildeBot.MixProject do
       {:tesla, "~> 1.4"},
       {:hackney, "~> 1.17"},
       {:jason, "~> 1.2"},
-      {:logger_file_backend, "0.0.12"}
+      {:logger_file_backend, "0.0.12"},
+      {:floki, "~> 0.32.0"}
     ]
   end
 end
