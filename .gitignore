@@ -24,3 +24,9 @@ lleva_tilde_bot-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Token
+bot.token
+
+# Logs
+log/
