@@ -1,21 +1,22 @@
 # LlevaTildeBot
 
-**TODO: Add description**
+## Uso de `@lleva_tilde_bot`
 
-## Installation
+Envía una palabra con una tilde donde dudes que debería ir.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `lleva_tilde_bot` to your list of dependencies in `mix.exs`:
+Por ejemplo:
+  - _línea_
+  - _esdrújula_
+  - _monuménto_ (no lleva tilde)
+  - _cása_ (no lleva tilde)
+  - _cláramente_ (no lleva tilde)
 
-```elixir
-def deps do
-  [
-    {:lleva_tilde_bot, "~> 0.1.0"}
-  ]
-end
-```
+Como se puede ver, aunque la palabra no lleve tilde es obligatorio poner una tilde para hacer el análisis sobre esa sílaba.
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/lleva_tilde_bot](https://hexdocs.pm/lleva_tilde_bot).
+El bot contestará con un análisis de la palabra y algunos ejemplos en caso de tildes diacríticas.
 
+Ejemplos:
+
+![cantaro](./docs/images/cantaro_example.png)
+
+![como](./docs/images/como_example.png)
