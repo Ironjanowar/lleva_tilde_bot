@@ -20,3 +20,5 @@ Ejemplos:
 ![cantaro](./docs/images/cantaro_example.png)
 
 ![como](./docs/images/como_example.png)
+
+![dormia](./docs/images/dormia_example.png)
