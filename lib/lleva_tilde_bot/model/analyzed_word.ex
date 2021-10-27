@@ -40,6 +40,7 @@ defmodule LlevaTildeBot.Model.AnalyzedWord do
   end
 
   def to_map(%__MODULE__{} = analyzed_word) do
-    analyzed_word |> Map.from_struct() |> Map.take(@fields)
+    fields = @fields ++ [:diacritic_examples]
+    analyzed_word |> Map.from_struct() |> Map.take(fields)
   end
 end
