@@ -10,6 +10,8 @@ defmodule LlevaTildeBot.Application do
     token = ExGram.Config.get(:ex_gram, :token)
 
     children = [
+      LlevaTildeBot.Repo,
+      {Oban, oban_config()},
       ExGram,
       {LlevaTildeBot.Bot, [method: :polling, token: token]}
     ]
@@ -18,5 +20,9 @@ defmodule LlevaTildeBot.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: LlevaTildeBot.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  defp oban_config do
+    Application.fetch_env!(:lleva_tilde_bot, Oban)
   end
 end

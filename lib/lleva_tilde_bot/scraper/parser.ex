@@ -1,5 +1,5 @@
 defmodule LlevaTildeBot.Scraper.Parser do
-  def parse_word_result(html) do
+  def parse_word_result(word, html) do
     with {:ok, document} <- Floki.parse_document(html) do
       syllables = get_syllables(document)
       analysis = get_analysis(document)
@@ -11,6 +11,7 @@ defmodule LlevaTildeBot.Scraper.Parser do
 
       result =
         %{
+          word: word,
           syllables: syllables,
           analysis: analysis,
           conclusion: conclusion,
@@ -39,9 +40,6 @@ defmodule LlevaTildeBot.Scraper.Parser do
     |> Floki.find("p.showtext")
     |> Enum.at(0)
     |> Floki.text()
-
-    # |> Enum.map(&Floki.text/1)
-    # |> Enum.find(&String.match?(&1, ~r/se analiza/i))
   end
 
   defp get_conclusion(document) do

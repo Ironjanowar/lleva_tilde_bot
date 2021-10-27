@@ -1,4 +1,6 @@
 defmodule LlevaTildeBot.MessageFormatter do
+  alias LlevaTildeBot.Model.AnalyzedWord
+
   def help_command() do
     message = """
     Envía una palabra con una tilde donde dudes que debería ir.
@@ -43,18 +45,18 @@ defmodule LlevaTildeBot.MessageFormatter do
     {message, []}
   end
 
-  def format_word_result(word, result) do
-    result = result |> Enum.map(&format_result_field/1) |> Map.new()
+  def format_word_result(%AnalyzedWord{} = analyzed_word) do
+    result = analyzed_word |> Map.from_struct() |> Enum.map(&format_result_field/1) |> Map.new()
 
     message =
-      "📜 *#{word}* 📜\n"
-      |> maybe_add(result[:warning])
-      |> maybe_add(result[:syllables])
-      |> maybe_add(result[:analysis])
-      |> maybe_add(result[:conclusion])
-      |> maybe_add(result[:reason])
-      |> maybe_add(result[:result])
-      |> maybe_add(result[:diacritic_examples])
+      "📜 *#{result.word}* 📜\n"
+      |> maybe_add(result.warning)
+      |> maybe_add(result.syllables)
+      |> maybe_add(result.analysis)
+      |> maybe_add(result.conclusion)
+      |> maybe_add(result.reason)
+      |> maybe_add(result.result)
+      |> maybe_add(result.diacritic_examples)
 
     {message, [parse_mode: "Markdown"]}
   end
