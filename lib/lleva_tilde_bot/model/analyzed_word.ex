@@ -41,6 +41,11 @@ defmodule LlevaTildeBot.Model.AnalyzedWord do
 
   def to_map(%__MODULE__{} = analyzed_word) do
     fields = @fields ++ [:diacritic_examples]
-    analyzed_word |> Map.from_struct() |> Map.take(fields)
+    diacritic_examples = Enum.map(analyzed_word.diacritic_examples, &DiacriticExample.to_map/1)
+
+    analyzed_word
+    |> Map.from_struct()
+    |> Map.put(:diacritic_examples, diacritic_examples)
+    |> Map.take(fields)
   end
 end

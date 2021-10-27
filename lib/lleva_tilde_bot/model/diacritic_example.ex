@@ -12,4 +12,8 @@ defmodule LlevaTildeBot.Model.DiacriticExample do
   def changeset(%__MODULE__{} = schema \\ %__MODULE__{}, attrs) do
     Ecto.Changeset.cast(schema, attrs, @fields)
   end
+
+  def to_map(%__MODULE__{} = diacritic_example) do
+    diacritic_example |> Map.from_struct() |> Map.take(@fields)
+  end
 end
