@@ -29,8 +29,8 @@ defmodule LlevaTildeBot.Bot do
     answer(context, message, opts)
   end
 
-  def handle({:text, text, _msg}, context) do
-    {message, opts} = LlevaTildeBot.get_word(text)
+  def handle({:text, text, %{from: from}}, context) do
+    {message, opts} = LlevaTildeBot.get_word(text, from)
     answer(context, message, opts)
   end
 end

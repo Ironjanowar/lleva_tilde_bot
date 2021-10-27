@@ -3,7 +3,7 @@ defmodule LlevaTildeBot.Scraper do
 
   def get_word(word) do
     with {:ok, html} <- Client.get_word(word) do
-      Parser.parse_word_result(html)
+      Parser.parse_word_result(word, html)
     end
   end
 end

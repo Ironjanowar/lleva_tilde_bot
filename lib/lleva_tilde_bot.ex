@@ -1,13 +1,18 @@
 defmodule LlevaTildeBot do
-  alias LlevaTildeBot.{MessageFormatter, Scraper}
+  alias LlevaTildeBot.{MessageFormatter, Scraper, Store}
+  alias LlevaTildeBot.Model.AnalyzedWord
+  alias LlevaTildeBot.Worker.{AnalyzedWordStorer, UserStorer}
 
   require Logger
 
-  def get_word(text) do
+  def get_word(text, from) do
+    UserStorer.enqueue(from)
+
     with {:ok, word} <- parse_input(text),
          :ok <- check_acute_accent(word),
-         {:ok, result} <- Scraper.get_word(word) do
-      MessageFormatter.format_word_result(word, result)
+         {:ok, result} <- get_or_scrape_word(word) do
+      AnalyzedWordStorer.enqueue(result)
+      MessageFormatter.format_word_result(result)
     else
       {:error, :bad_input} ->
         MessageFormatter.bad_input()
@@ -15,6 +20,20 @@ defmodule LlevaTildeBot do
       error ->
         error |> inspect |> Logger.error()
         MessageFormatter.unknown_error()
+    end
+  end
+
+  defp get_or_scrape_word(word) do
+    case Store.find_analyzed_words(word: word) do
+      [word] -> {:ok, word}
+      _ -> scrape_word(word)
+    end
+  end
+
+  defp scrape_word(word) do
+    case Scraper.get_word(word) do
+      {:ok, result} -> AnalyzedWord.build(result)
+      _ -> {:error, "Could not scrape the word: #{inspect(word)}"}
     end
   end
 
