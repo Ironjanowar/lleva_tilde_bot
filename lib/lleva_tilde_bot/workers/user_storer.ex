@@ -6,8 +6,8 @@ defmodule LlevaTildeBot.Worker.UserStorer do
 
   require Logger
 
-  def enqueue(%{id: telegram_id, first_name: first_name, username: username}) do
-    %{telegram_id: telegram_id, first_name: first_name, username: username}
+  def enqueue(%{id: telegram_id} = user) do
+    %{telegram_id: telegram_id, first_name: user[:first_name], username: user[:username]}
     |> new()
     |> Oban.insert()
   end
