@@ -1,17 +1,16 @@
 defmodule LlevaTildeBot do
-  alias LlevaTildeBot.{MessageFormatter, Scraper, Store}
+  alias LlevaTildeBot.{AsyncStore, MessageFormatter, Scraper, Store}
   alias LlevaTildeBot.Model.AnalyzedWord
-  alias LlevaTildeBot.Worker.{AnalyzedWordStorer, UserStorer}
 
   require Logger
 
   def get_word(text, from) do
-    UserStorer.enqueue(from)
+    AsyncStore.store_user(from)
 
     with {:ok, word} <- parse_input(text),
          :ok <- check_acute_accent(word),
          {:ok, result} <- get_or_scrape_word(word) do
-      AnalyzedWordStorer.enqueue(result)
+      AsyncStore.store_analyzed_word(result)
       MessageFormatter.format_word_result(result)
     else
       {:error, :bad_input} ->

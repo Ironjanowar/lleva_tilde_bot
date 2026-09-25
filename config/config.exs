@@ -1,10 +1,9 @@
 import Config
 
 config :lleva_tilde_bot, LlevaTildeBot.Repo,
-  database: "lleva_tilde_bot_repo",
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost"
+  database: "lleva_tilde_bot.db",
+  pool_size: 1,
+  busy_timeout: 5_000
 
 config :lleva_tilde_bot,
   ecto_repos: [LlevaTildeBot.Repo]
@@ -13,22 +12,6 @@ config :ex_gram,
   token: {:system, "BOT_TOKEN"},
   adapter: ExGram.Adapter.Req
 
-config :logger,
-  level: :debug,
-  truncate: :infinity,
-  backends: [{LoggerFileBackend, :debug}, {LoggerFileBackend, :error}]
+config :logger, level: :info
 
-config :logger, :debug,
-  path: "log/debug.log",
-  level: :debug,
-  format: "$dateT$timeZ [$level] $message\n"
-
-config :logger, :error,
-  path: "log/error.log",
-  level: :error,
-  format: "$dateT$timeZ [$level] $message\n"
-
-config :lleva_tilde_bot, Oban,
-  repo: LlevaTildeBot.Repo,
-  pruner: Oban.Pruner,
-  queues: [default: 10]
+config :logger, :default_formatter, format: "$dateT$timeZ [$level] $message\n"

@@ -25,11 +25,9 @@ defmodule LlevaTildeBot.MixProject do
       {:ex_gram, "~> 0.70"},
       {:req, "~> 0.7.4"},
       {:jason, "~> 1.4"},
-      {:logger_file_backend, "~> 0.1.1"},
       {:floki, "~> 0.38.4"},
       {:ecto_sql, "~> 3.14"},
-      {:postgrex, "~> 0.22.4"},
-      {:oban, "~> 2.24"}
+      {:ecto_sqlite3, "~> 0.24.1"}
     ]
   end
 end

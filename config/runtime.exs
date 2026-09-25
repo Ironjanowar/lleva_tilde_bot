@@ -1,13 +1,12 @@
 import Config
 
 if config_env() == :prod do
-  database_url = System.fetch_env!("DATABASE_URL")
+  database_path = System.fetch_env!("DATABASE_PATH")
 
   config :lleva_tilde_bot, LlevaTildeBot.Repo,
-    url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE", "5"))
+    database: database_path,
+    pool_size: 1,
+    busy_timeout: 5_000
 
-  config :logger,
-    level: :info,
-    backends: [:console]
+  config :logger, level: :info
 end

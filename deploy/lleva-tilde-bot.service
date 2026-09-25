@@ -1,8 +1,7 @@
 [Unit]
 Description=Lleva Tilde Telegram bot
 Wants=network-online.target
-After=network-online.target lleva-tilde-postgres.service
-Requires=lleva-tilde-postgres.service
+After=network-online.target
 
 [Service]
 Type=simple
@@ -18,6 +17,7 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=read-only
+ReadWritePaths=/home/cuwano/.local/share/lleva_tilde_bot
 
 [Install]
 WantedBy=default.target

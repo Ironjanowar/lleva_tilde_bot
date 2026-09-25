@@ -6,7 +6,10 @@ defmodule LlevaTildeBot.Store do
   def insert_user(params) do
     params
     |> User.changeset()
-    |> Repo.insert()
+    |> Repo.insert(
+      on_conflict: [inc: [uses: 1]],
+      conflict_target: [:telegram_id]
+    )
   end
 
   def find_users(params \\ []) do
@@ -15,16 +18,10 @@ defmodule LlevaTildeBot.Store do
     |> Repo.all()
   end
 
-  def update_user_uses(%User{} = user) do
-    user
-    |> User.update_uses_changeset()
-    |> Repo.update()
-  end
-
   def insert_analyzed_word(params) do
     params
     |> AnalyzedWord.changeset()
-    |> Repo.insert()
+    |> Repo.insert(on_conflict: :nothing, conflict_target: [:word])
   end
 
   def find_analyzed_words(params \\ []) do
