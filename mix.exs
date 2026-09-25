@@ -5,7 +5,7 @@ defmodule LlevaTildeBot.MixProject do
     [
       app: :lleva_tilde_bot,
       version: "0.1.0",
-      elixir: "~> 1.12",
+      elixir: "~> 1.20",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -22,15 +22,12 @@ defmodule LlevaTildeBot.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_gram, "~> 0.24"},
-      {:tesla, "~> 1.4"},
-      {:hackney, "~> 1.17"},
-      {:jason, "~> 1.2"},
-      {:logger_file_backend, "0.0.12"},
-      {:floki, "~> 0.32.0"},
-      {:ecto_sql, "~> 3.7"},
-      {:postgrex, "~> 0.15"},
-      {:oban, "~> 2.9"}
+      {:ex_gram, "~> 0.70"},
+      {:req, "~> 0.7.4"},
+      {:jason, "~> 1.4"},
+      {:floki, "~> 0.38.4"},
+      {:ecto_sql, "~> 3.14"},
+      {:ecto_sqlite3, "~> 0.24.1"}
     ]
   end
 end

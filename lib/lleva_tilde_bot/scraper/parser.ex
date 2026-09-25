@@ -1,26 +1,16 @@
 defmodule LlevaTildeBot.Scraper.Parser do
   def parse_word_result(word, html) do
     with {:ok, document} <- Floki.parse_document(html) do
-      syllables = get_syllables(document)
-      analysis = get_analysis(document)
-      conclusion = get_conclusion(document)
-      reason = get_reason(document)
-      result = get_result(document)
-      warning = get_warning(document)
-      diacritic_examples = get_diacritic_examples(document)
-
-      result =
-        %{
-          word: word,
-          syllables: syllables,
-          analysis: analysis,
-          conclusion: conclusion,
-          reason: reason,
-          result: result,
-          warning: warning,
-          diacritic_examples: diacritic_examples
-        }
-        |> IO.inspect()
+      result = %{
+        word: word,
+        syllables: get_syllables(document),
+        analysis: get_analysis(document),
+        conclusion: get_conclusion(document),
+        reason: get_reason(document),
+        result: get_result(document),
+        warning: get_warning(document),
+        diacritic_examples: get_diacritic_examples(document)
+      }
 
       {:ok, result}
     end
@@ -28,95 +18,160 @@ defmodule LlevaTildeBot.Scraper.Parser do
 
   def get_syllables(document) do
     document
-    |> Floki.find("article")
-    |> Floki.find("div.word")
-    |> Enum.at(0)
+    |> section_elements("Separación silábica")
+    |> Enum.find(&has_class?(&1, "text-3xl"))
     |> clean_string()
   end
 
   def get_analysis(document) do
     document
-    |> Floki.find("article")
-    |> Floki.find("p.showtext")
-    |> Enum.at(0)
-    |> Floki.text()
+    |> section_elements("Análisis:", :starts_with)
+    |> first_text("p.resulttext")
   end
 
   defp get_conclusion(document) do
     document
-    |> Floki.find("article")
-    |> Floki.find("p.resulttext")
-    |> clean_string()
+    |> section_elements("Conclusión")
+    |> first_text("p")
   end
 
   defp get_reason(document) do
-    document
-    |> Floki.find("article")
-    |> Floki.find("p.showtext")
-    |> Enum.at(1)
-    |> clean_string
-  end
+    nodes = section_elements(document, "Aplicación de reglas")
 
-  defp get_result(document) do
-    result =
-      document
-      |> Floki.find("article")
-      |> Floki.find("div.resulttext")
-      |> Enum.at(1)
-      |> clean_string()
-
-    correct_word = get_correct_word(document)
-
-    case {result, correct_word} do
-      {"", _} -> nil
-      {_, ""} -> nil
-      {result, correct_word} -> "#{result} *#{correct_word}*"
+    case text_list(nodes, "li") do
+      [] -> first_text(nodes, "p")
+      rules -> Enum.join(rules, " ")
     end
   end
 
-  defp get_correct_word(document) do
+  defp get_result(document) do
     document
-    |> Floki.find("article")
-    |> Floki.find("div.word")
-    |> Enum.at(1)
+    |> Floki.find(".warning + div.showtext")
+    |> List.first()
     |> clean_string()
+    |> empty_to_nil()
   end
 
   defp get_warning(document) do
     document
-    |> Floki.find("article")
-    |> Floki.find("div.warning")
-    |> Floki.find(".text_warning")
+    |> Floki.find(".warning .text_warning")
+    |> List.first()
     |> clean_string()
+    |> empty_to_nil()
   end
 
   defp get_diacritic_examples(document) do
-    parent =
-      document
-      |> Floki.find("article")
-      |> Floki.find("div.resulttext")
-
-    diacritic_words =
-      Floki.find(parent, "div.diacriticWord")
-      |> Enum.map(&clean_string/1)
-
-    diacritic_word_types =
-      Floki.find(parent, "div.hometext")
-      |> Enum.map(&clean_string/1)
-
-    diacritic_examples =
-      Floki.find(parent, "div.diacriticText")
-      |> Enum.map(&clean_string/1)
-
-    Enum.zip_with([diacritic_words, diacritic_word_types, diacritic_examples], &to_diacritic/1)
+    document
+    |> Floki.find("article div.resulttext")
+    |> Enum.find(&(Floki.find(&1, ".diacriticWord") != []))
+    |> child_elements()
+    |> Enum.reduce([], &collect_diacritic_field/2)
+    |> Enum.reverse()
+    |> Enum.filter(&complete_diacritic_example?/1)
   end
 
-  defp to_diacritic([word, type, example]), do: %{word: word, type: type, example: example}
+  defp collect_diacritic_field(node, examples) do
+    cond do
+      has_class?(node, "diacriticWord") ->
+        [%{word: clean_string(node), type: nil, example: nil} | examples]
 
-  defp clean_string(string) do
-    string
+      has_class?(node, "hometext") ->
+        update_current_example(examples, :type, clean_string(node))
+
+      has_class?(node, "diacriticText") ->
+        update_current_example(examples, :example, clean_string(node))
+
+      true ->
+        examples
+    end
+  end
+
+  defp update_current_example([], _field, _value), do: []
+
+  defp update_current_example([example | rest], field, value) do
+    [Map.put(example, field, value) | rest]
+  end
+
+  defp complete_diacritic_example?(example) do
+    Enum.all?([example.word, example.type, example.example], &is_binary/1)
+  end
+
+  defp section_elements(document, heading, match \\ :exact) do
+    document
+    |> all_elements()
+    |> Enum.find_value([], fn container ->
+      elements = child_elements(container)
+
+      case Enum.split_while(elements, &(not heading?(&1, heading, match))) do
+        {_before, []} ->
+          false
+
+        {_before, [_heading | after_heading]} ->
+          Enum.take_while(after_heading, &(element_tag(&1) != "h2"))
+      end
+    end)
+  end
+
+  defp heading?(node, heading, :exact) do
+    element_tag(node) == "h2" and clean_string(node) == heading
+  end
+
+  defp heading?(node, heading, :starts_with) do
+    element_tag(node) == "h2" and String.starts_with?(clean_string(node), heading)
+  end
+
+  defp first_text(nodes, selector) do
+    nodes
+    |> Floki.find(selector)
+    |> List.first()
+    |> clean_string()
+  end
+
+  defp text_list(nodes, selector) do
+    nodes
+    |> Floki.find(selector)
+    |> Enum.map(&clean_string/1)
+    |> Enum.reject(&(&1 == ""))
+  end
+
+  defp all_elements(nodes) when is_list(nodes) do
+    Enum.flat_map(nodes, &all_elements/1)
+  end
+
+  defp all_elements({_tag, _attributes, children} = node) do
+    [node | all_elements(children)]
+  end
+
+  defp all_elements(_node), do: []
+
+  defp child_elements(nil), do: []
+
+  defp child_elements({_tag, _attributes, children}) do
+    Enum.filter(children, &match?({_, _, _}, &1))
+  end
+
+  defp element_tag({tag, _attributes, _children}), do: tag
+  defp element_tag(_node), do: nil
+
+  defp has_class?({_tag, attributes, _children}, class) do
+    attributes
+    |> List.keyfind("class", 0, {"class", ""})
+    |> elem(1)
+    |> String.split()
+    |> Enum.member?(class)
+  end
+
+  defp has_class?(_node, _class), do: false
+
+  defp clean_string(nil), do: ""
+
+  defp clean_string(node) do
+    node
     |> Floki.text()
-    |> String.replace("\n", "")
+    |> String.replace(~r/\s+/u, " ")
     |> String.trim()
   end
+
+  defp empty_to_nil(""), do: nil
+  defp empty_to_nil(value), do: value
 end

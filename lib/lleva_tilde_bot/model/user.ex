@@ -4,7 +4,7 @@ defmodule LlevaTildeBot.Model.User do
   alias Ecto.Changeset
 
   schema "users" do
-    field(:telegram_id, :integer, null: false)
+    field(:telegram_id, :integer)
     field(:first_name, :string)
     field(:username, :string)
     field(:uses, :integer, default: 1)
