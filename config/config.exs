@@ -10,7 +10,8 @@ config :lleva_tilde_bot,
   ecto_repos: [LlevaTildeBot.Repo]
 
 config :ex_gram,
-  token: {:system, "BOT_TOKEN"}
+  token: {:system, "BOT_TOKEN"},
+  adapter: ExGram.Adapter.Req
 
 config :logger,
   level: :debug,
@@ -29,5 +30,5 @@ config :logger, :error,
 
 config :lleva_tilde_bot, Oban,
   repo: LlevaTildeBot.Repo,
-  plugins: [Oban.Plugins.Pruner],
+  pruner: Oban.Pruner,
   queues: [default: 10]

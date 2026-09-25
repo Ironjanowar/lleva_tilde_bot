@@ -1,0 +1,21 @@
+[Unit]
+Description=Lleva Tilde Bot PostgreSQL
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStart=/home/cuwano/.local/share/mise/installs/postgres/14.24/bin/postgres -D /home/cuwano/.local/share/lleva_tilde_bot/postgres -p 55432
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+TimeoutStopSec=120
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/cuwano/.local/share/lleva_tilde_bot/postgres
+
+[Install]
+WantedBy=default.target

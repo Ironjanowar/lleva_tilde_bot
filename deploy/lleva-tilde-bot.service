@@ -1,0 +1,23 @@
+[Unit]
+Description=Lleva Tilde Telegram bot
+Wants=network-online.target
+After=network-online.target lleva-tilde-postgres.service
+Requires=lleva-tilde-postgres.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/cuwano/apps/lleva_tilde_bot
+Environment=LANG=C.UTF-8
+EnvironmentFile=/home/cuwano/.config/lleva_tilde_bot/env
+ExecStart=/home/cuwano/apps/lleva_tilde_bot/_build/prod/rel/lleva_tilde_bot/bin/lleva_tilde_bot start
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+
+[Install]
+WantedBy=default.target

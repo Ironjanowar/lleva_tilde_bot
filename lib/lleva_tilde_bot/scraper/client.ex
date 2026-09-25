@@ -1,14 +1,16 @@
 defmodule LlevaTildeBot.Scraper.Client do
-  use Tesla
-
-  plug(Tesla.Middleware.BaseUrl, "https://llevatilde.es")
+  @base_url "https://llevatilde.es"
 
   def get_word(word) do
-    word = URI.encode(word)
+    url = "#{@base_url}/palabra/#{URI.encode(word, &URI.char_unreserved?/1)}"
 
-    case get("/palabra/#{word}") do
-      {:ok, %{body: html}} -> {:ok, html}
-      _ -> :error
+    case Req.get(url, redirect: true, max_redirects: 3) do
+      {:ok, %Req.Response{status: status, body: html}}
+      when status in 200..299 and is_binary(html) ->
+        {:ok, html}
+
+      _response ->
+        :error
     end
   end
 end
